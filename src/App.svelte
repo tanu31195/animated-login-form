@@ -1,21 +1,22 @@
 <script>
 
+    let strength = 0;
+    let validations = [];
+    let showPassword = false;
+
+    function validatePassword(e) {
+        const password = e.target.value;
+
+        validations = [
+            (password.length > 5),
+            (password.search(/[A-Z]/) > -1),
+            (password.search(/[0-9]/) > -1),
+            (password.search(/[$&+,:;=?@#]/) > -1)
+        ]
+
+        strength = validations.reduce((acc, cur => acc + cur))
+    }
 </script>
-
-<main>
-    <form>
-        <div class="field">
-            <input type="email" name="email" class="input" placeholder=""/>
-            <label for="email" class="label">Email</label>
-        </div>
-
-        <div class="field">
-            <input type="password" name="password" class="input" placeholder=""/>
-            <label for="password" class="label">Password</label>
-        </div>
-
-    </form>
-</main>
 
 <style>
     form {
@@ -31,6 +32,11 @@
     }
 
     .label {
+        color: var(--text-color);
+        font-size: 1.2rem;
+    }
+
+    .input {
         outline: none;
         border: none;
         overflow: hidden;
@@ -51,7 +57,7 @@
         color: orangered;
     }
 
-/*	Border Animation */
+    /*	Border Animation */
 
     .field::after {
         content: "";
@@ -60,7 +66,7 @@
         width: 100%;
         background: #d16dff;
         transform: scaleX(0);
-        transform-origin: 0; /* left to right. Set to 100 for right to left */
+        transform-origin: 0%; /* left to right. Set to 100 for right to left */
         transition: transform 500ms ease;
         top: 2px;
     }
@@ -73,7 +79,7 @@
         transform: scaleX(1);
     }
 
-/*    Label Animation */
+    /*    Label Animation */
     .label {
         z-index: -1;
         position: absolute;
@@ -87,4 +93,84 @@
         transform: scale(0.8) translateY(-5rem);
     }
 
+    /*    Strength Meter*/
+    .strength {
+        height: 20px;
+        width: 100%;
+    }
+
+    .bar {
+        margin-right: 5px;
+        height: 100%;
+        width: 25%;
+        transition: box-shadow 500ms;
+        box-shadow: inset 0px 20px #1f1f1f;
+    }
+
+    .bar-show {
+        box-shadow: none;
+    }
+
+    .bar-1 {
+        background: linear-gradient(to right, red, orangered);
+    }
+
+    .bar-2 {
+        background: linear-gradient(to right, orangered, yellow);
+    }
+
+    .bar-3 {
+        background: linear-gradient(to right, yellow, yellowgreen);
+    }
+
+    .bar-4 {
+        background: linear-gradient(to right, yellowgreen, green);
+    }
+
+    .toggle-password {
+        position: absolute;
+        cursor: help;
+        font-size: 0.8rem;
+        right: 0.25rem;
+        bottom: 0.25rem;
+    }
+
 </style>
+
+<main>
+    <form>
+        <div class="field">
+            <input type="email" name="email" class="input" placeholder=""/>
+            <label for="email" class="label">Email</label>
+        </div>
+
+        <div class="field">
+            <input type={showPassword ? 'text' : 'password'} name="password" class="input" placeholder=""
+                   on:input={validatePassword}/>
+            <label for="password" class="label">Password</label>
+
+            <span
+                    class="toggle-password"
+                    on:mouseenter={() => (showPassword = true)}>
+                    on:mouseleave={() => (showPassword = false)}>
+                {showPassword ? 'H' : 'S'}
+            </span>
+        </div>
+
+        <div class="strength">
+            <span class="bar bar-1" class:bar-show={strength > 0}/>
+            <span class="bar bar-2" class:bar-show={strength > 1}/>
+            <span class="bar bar-3" class:bar-show={strength > 2}/>
+            <span class="bar bar-4" class:bar-show={strength > 3}/>
+        </div>
+
+
+        <ul>
+            <li> {validations[0] ? 'C' : 'W' } must be at least 5 characters</li>
+            <li> {validations[1] ? 'C' : 'W' } must contain a capital letter</li>
+            <li> {validations[2] ? 'C' : 'W' } must contain a number</li>
+            <li> {validations[3] ? 'C' : 'W' } must contain a symbol</li>
+        </ul>
+
+    </form>
+</main>
